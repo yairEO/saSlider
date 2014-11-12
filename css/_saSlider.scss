@@ -1,0 +1,117 @@
+html, body{ height:100%; }
+body{ font:14px 'Open Sans Condensed', 'Helvetica Neue', Arial; background:#000;  }
+
+
+$ease-out      : cubic-bezier(0,.83,.45,1);
+$double-ease   : cubic-bezier(.5,0,.5,1);
+$slideDuration : .8s;
+
+.slider{ height:100%; position:relative; overflow:hidden;
+
+    // Left / Right arrows
+    > .arrow{
+        $effectDistance : 60px;
+
+        position:absolute; z-index:5; top:0; bottom:0;
+        width:8%; min-width:60px; max-width:200px; text-align:center; overflow:hidden;
+        text-shadow:0 0 10px rgba(black,.5); font-family:Arial; cursor:pointer;
+        transition:.4s;
+
+        &:hover{ // background:rgba(white,.1);
+            &::after{ opacity:.9; }
+        }
+
+        &::after{
+            font-size:150px;
+            opacity:.5;
+            position:absolute;
+            top:0; bottom:0; left:0; right:0;
+            height:180px; margin:auto; color:transparent;
+            transition:.25s $double-ease;
+        }
+
+        &.prev{ left:0;
+            &::after{ content:'\2039'; text-shadow:$effectDistance 0px transparent, 0 0 #FFF; }
+            &:hover::after{ text-shadow:0 0px #FFF, -$effectDistance 0 transparent; }
+        }
+        &.next{ right:0;
+            &::after{ content:'\203A'; text-shadow:-$effectDistance 0px transparent, 0 0 #FFF; }
+            &:hover::after{ text-shadow:0 0px #FFF, $effectDistance 0 transparent; }
+        }
+    }
+
+    &.start > .arrow.prev{ transform:translatex(-100%); width:0; }
+    &.end > .arrow.next{ transform:translatex(100%); width:0; }
+
+
+    // indicators
+    > .indicators{ position:absolute; bottom:3%; width:100%; text-align:center; z-index:2;
+        > .wrap{ display:inline-block; position:relative;
+            $size : 11px;
+            $gap  : 6px;
+            > i, b{ display:inline-block; margin:0 $gap; border-radius:50%; width:0; height:0; padding:$size; border:2px solid rgba(white,.5); }
+            > i{ box-shadow:0 0 8px rgba(black,.2), 0 0 8px rgba(black,.2) inset; cursor:pointer; transition:.1s ease-out;
+                &:hover{ border-color:#FFF; }
+            }
+            > b{ position:absolute; background:#FFF; margin:-2px #{$gap - 2}; padding:$size + 2; left:0; top:0; opacity:1; transition:$slideDuration $double-ease; }
+        }
+    }
+
+
+    // List of slides
+    ul{ margin:0; padding:0; height:100%; width:100%; list-style:none; white-space:nowrap; font-size:0; margin:0 -4px;
+        > li{
+            display:inline-block;
+            overflow:hidden;
+            width:0;
+            height: 100%;
+            vertical-align:top;
+            position:relative;
+            transition:$slideDuration $double-ease;
+            //border-right:5px solid transparent; border-left:5px solid transparent;
+
+            //&.peek{ transition:.2s ease-out; }
+
+            &.active{
+                width:100%;
+                margin:0 4px;
+                // box-sizing: border-box;
+                z-index:2;
+
+                // some stuff for the demo
+                > .content{
+                    > h1{ transform:none; transition:.4s .8s $ease-out; }
+                    > .by{ transform:none; transition:.5s 1s $ease-out; }
+                }
+            }
+
+
+            > img{
+                position:relative;
+                top:50%;
+                left:50%;
+                width:100vw;
+                transform:translate(-50%, -50%);
+            }
+
+            &.portrait{
+                > img{ width:auto; height:100vh; }
+            }
+
+            // texts content
+            > .content{ position:absolute; left:12%; bottom:10%;
+                text-shadow:0 0 8px rgba(black,.5); z-index:3; color:#FFF; font-size:1.5rem;
+                > h1{ font:2.6em 'Courgette', cursive; margin:0; transform:translateY(200px); transition:.3s 60ms ease-in; }
+                > .by{ transform:translateY(120px); transition:.2s ease-in;
+                    > span{ display:inline-block; line-height:1; padding-right:.8em; margin-right:.5em; border-right:6px solid rgba(#F43356,.5); }
+                    > a{ padding:1px 5px; color:rgba(white,.6); text-decoration:none; border-radius:6px; transition:.1s;
+                        &::after{ display:inline-block; opacity:0; content:'Photo Contests'; font-size:.8em; max-width:0; line-height:.9; overflow:hidden; transition:.3s ease-out; }
+                        &:hover{ color:#FFF; background:rgba(black,.2); text-shadow:0 0 6px #000;
+                            &::after{ max-width:140px; margin-left:.5em; opacity:.6; }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
