@@ -1,0 +1,43 @@
+@import "normalize";
+
+html, body{ height:100%; }
+body{ font:14px 'Open Sans Condensed', 'Helvetica Neue', Arial; background:#1B2026; padding:0;
+    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,#2F3842), color-stop(100%,#1B2026)); /* Chrome,Safari4+ */
+    background: -webkit-radial-gradient(center, ellipse cover,  #2F3842 0%,#1B2026 100%);
+    background: -ms-radial-gradient(center, ellipse cover,  #2F3842 0%, #1B2026 100%);
+    background: radial-gradient(ellipse at center, #2F3842 0%, #1B2026 100%);
+}
+
+#changeMode{ position:absolute; z-index:8; right:1em; top:1em; background:rgba(0,0,0,.02); padding:.3em 1em; color:#FFF; font-size:2em; text-shadow:0 0 6px rgba(0,0,0,.4); border:2px solid rgba(white,.6);
+    &:hover{ border-color:#FFF; }
+}
+
+
+
+
+
+.info{ color:#FFF; font-size:1.2em; padding:40px 60% 40px 40px;
+    > h1{ line-height:1; margin-bottom:1.5em;
+        > span{ display:block; opacity:.6; font-size:.8em; }
+    }
+    form input{ opacity:.6; transition:.11s;
+        &:hover{ opacity:1; }
+    }
+}
+
+//////////////////////
+// saSlider MODE2
+
+.slider{ position:absolute; top:0; width:100%; right:0; }
+.slider.mode2{
+     width:50%; min-width:500px; height:calc(100% - 50px); margin:25px; border-radius:8px;
+
+    > .indicators{ bottom:2%;
+        > .wrap{
+            $size : 9px;
+            $gap  : 6px;
+            > i, b{ margin:0 $gap; padding:$size; }
+            > b{ margin:4px #{$gap + 4}; padding:$size - 4; }
+        }
+    }
+}

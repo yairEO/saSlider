@@ -39,7 +39,7 @@
         if( this.settings.indicators )
             this.indicators.generate.apply(this);
 
-        this.checkOrientation.call(this, this.active);
+        this.checkOrientation.call(this);
 
         // last thing
         this.bind();
@@ -63,7 +63,7 @@
             });
             // window resize
             DOM.window.on('resize.' + pluginName, function(){
-                Date.now() % 2 == 0 && that.checkOrientation.call(that, that.active);
+                Date.now() % 2 == 0 && that.checkOrientation.call(that);
             });
         },
 
@@ -84,17 +84,25 @@
         // change the current slide
         changeSlide : function(idx){
             var isAnimating = this.active.width() < this.slider[0].clientWidth,
-                newActive = this.slides.eq(idx);
+                newActive = this.slides.eq(idx),
+                floatItem;
 
             // if there shouldn't be looping and it's the "edge", do not continue
             if( isAnimating || (!this.settings.loop && !newActive.length) )
                 return;
 
+            this.slider.toggleClass('prevSlide', idx < this.index);
+
             // loop logic
-            if( idx > this.slides.length - 1 )
+            if( idx > this.slides.length - 1 ){
                 idx = 0;
-            else if( idx < 0 )
+            }
+            else if( idx < 0 ){
                 idx = this.slides.length - 1;
+            }
+
+
+
 
             // find newActive again one "idx" has been fixed
             newActive = this.slides.eq(idx);
@@ -119,6 +127,7 @@
         checkOrientation : (function(){
             var timer; // throttle timer
             return function($slide){
+                $slide = $slide || this.active;
                 var that = this, img, portrait;
 
                 // Chrome doesn't report the dimentions properly unless theres a delay
@@ -130,7 +139,9 @@
                         that.checkOrientation.call(that, $slide);
                         return;
                     }
-                    portrait = img.clientHeight <= that.slider[0].clientHeight && img.clientWidth >= that.slider[0].clientWidth;
+
+                    // TODO - savwe the image aspect-ratio and compare it to the slider's aspect ratio to determine if it's c:portrait or not
+                    portrait = img.clientHeight < that.slider[0].clientHeight || img.clientWidth > that.slider[0].clientWidth;
                     $slide.toggleClass('portrait', portrait);
                 }, 20);
             }
@@ -149,10 +160,12 @@
                 this.slider.append(htmlString);
                 this.indicators.elm = this.slider.find('.indicators');
                 this.indicators.marker = this.indicators.elm.find('b');
+                return this;
             },
             mark : function(){
                 var pos = this.indicators.marker.outerWidth(true) * this.index;
                 this.indicators.marker.css('left', pos);
+                return this;
             }
         }
     }

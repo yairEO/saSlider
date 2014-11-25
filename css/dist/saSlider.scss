@@ -1,31 +1,31 @@
-html, body{ height:100%; }
-body{ font:14px 'Open Sans Condensed', 'Helvetica Neue', Arial; background:#000;  }
-
-
-$ease-out      : cubic-bezier(0,.83,.45,1);
-$double-ease   : cubic-bezier(.5,0,.5,1);
-$slideDuration : .8s;
-
 .slider{ height:100%; position:relative; overflow:hidden;
+    $ease-out      : cubic-bezier(0,.83,.45,1);
+    $double-ease   : cubic-bezier(.5,0,.5,1);
+    $slideDuration : .8s;
+
+    // for the demo
+    width:100%;
+    transition:.5s $double-ease;
 
     // Left / Right arrows
     > .arrow{
         $effectDistance : 60px;
 
         position:absolute; z-index:5; top:0; bottom:0;
-        width:8%; min-width:60px; max-width:200px; text-align:center; overflow:hidden;
-        text-shadow:0 0 10px rgba(black,.5); font-family:Arial; cursor:pointer;
+        width:8%; min-width:80px; max-width:200px; text-align:center; overflow:hidden;
+        text-shadow:0 0 10px rgba(black,.5); font-family:Arial; font-size:150px; cursor:pointer;
         transition:.4s;
 
         &:hover{ // background:rgba(white,.1);
-            &::after{ opacity:.9; }
+            &::after{ opacity:.9; font-size:1.2em; line-height:.8; }
         }
+        &:active{ opacity:.6; text-shadow:0 0 10px #FFF; transition:0s; }
 
         &::after{
-            font-size:150px;
             opacity:.5;
             position:absolute;
             top:0; bottom:0; left:0; right:0;
+            line-height:1;
             height:180px; margin:auto; color:transparent;
             transition:.25s $double-ease;
         }
@@ -57,27 +57,43 @@ $slideDuration : .8s;
         }
     }
 
+    // move gallery is going to previous slide
+    &.prevSlide{
+        ul > li{ left:auto; right:0;
+            &.active{ left:0; right:auto; }
+        }
+    }
+
 
     // List of slides
-    ul{ margin:0; padding:0; height:100%; width:100%; list-style:none; white-space:nowrap; font-size:0; margin:0 -4px;
+    ul{ margin:0; padding:0; height:100%; width:100%; list-style:none; white-space:nowrap; font-size:0;
         > li{
+            //position:relative;
+            position: absolute;
+            left:0;
+            top:0;
+
             display:inline-block;
             overflow:hidden;
             width:0;
             height: 100%;
             vertical-align:top;
-            position:relative;
-            transition:$slideDuration $double-ease;
+
+
+            //transform: translateZ(0);
+            transition:width $slideDuration $double-ease;
             //border-right:5px solid transparent; border-left:5px solid transparent;
 
             //&.peek{ transition:.2s ease-out; }
 
             &.active{
                 width:100%;
-                margin:0 4px;
                 // box-sizing: border-box;
                 z-index:2;
+                left:auto;
+                right:0;
 
+                box-shadow:0 0 0 3px rgba(black,.5);
                 // some stuff for the demo
                 > .content{
                     > h1{ transform:none; transition:.4s .8s $ease-out; }
@@ -101,8 +117,8 @@ $slideDuration : .8s;
             // texts content
             > .content{ position:absolute; left:12%; bottom:10%;
                 text-shadow:0 0 8px rgba(black,.5); z-index:3; color:#FFF; font-size:1.5rem;
-                > h1{ font:2.6em 'Courgette', cursive; margin:0; transform:translateY(200px); transition:.3s 60ms ease-in; }
-                > .by{ transform:translateY(120px); transition:.2s ease-in;
+                > h1{ font:2.6em 'Courgette', cursive; margin:0; transform:translateY(220px); transition:.3s 60ms ease-in; }
+                > .by{ transform:translateY(140px); transition:.2s ease-in;
                     > span{ display:inline-block; line-height:1; padding-right:.8em; margin-right:.5em; border-right:6px solid rgba(#F43356,.5); }
                     > a{ padding:1px 5px; color:rgba(white,.6); text-decoration:none; border-radius:6px; transition:.1s;
                         &::after{ display:inline-block; opacity:0; content:'Photo Contests'; font-size:.8em; max-width:0; line-height:.9; overflow:hidden; transition:.3s ease-out; }

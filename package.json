@@ -1,0 +1,11 @@
+{
+  "name": "super awesome slider",
+  "description": "A jQuery slider plugin",
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "gulp": "^3.8.10",
+    "gulp-sass": "*",
+    "gulp-autoprefixer": "*"
+  }
+}
