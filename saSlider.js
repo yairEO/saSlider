@@ -15,8 +15,8 @@
 
     // default settings
     defaults = {
-        loop       : true,              // Allows to navigate between first and last images
-        indicators : true,
+        loop       : true,        // Allows to navigate between first and last images
+        indicators : true,        // renderes a UI which the number of slider and the current one
         keys       : {
             prev  : '37, 80',     // keycodes to navigate to the previous image, default: Left arrow (37), 'p' (80)
             next  : '39, 78'      // keycodes to navigate to the next image, default: Right arrow (39), 'n' (78)
@@ -36,9 +36,6 @@
         if( !this.settings.loop )
             this.markEdges();
 
-        if( this.settings.indicators )
-            this.indicators.generate.apply(this);
-
         this.checkOrientation.call(this);
 
         // last thing
@@ -49,25 +46,41 @@
         // All plugin-related events
         bind : function(){
             var that = this;
+
             // next / prev arrows
             this.slider.on('click', '> .arrow', this.events.btn.bind(this));
             // cleanup styles after transition
-            this.slider.find('> ul').on('transitionend', '> li', function(e){
-                e.currentTarget.removeAttribute('style');
-            });
+            this.slider.find('> ul').on('transitionend', '> li', this.events.transitionEnd.bind(this));
             // keyboard controls
             DOM.document.on('keydown.' + pluginName, this.events.keyDown.bind(this));
             // indicators
-            this.indicators.elm.on('click', 'i', function(){
-                that.changeSlide( $(this).index() );
-            });
+            if( this.settings.indicators ){
+                this.indicators.generate.apply(this);
+                this.indicators.elm.on('click', 'i', function(){
+                    that.changeSlide( $(this).index() );
+                });
+            }
             // window resize
             DOM.window.on('resize.' + pluginName, function(){
                 Date.now() % 2 == 0 && that.checkOrientation.call(that);
             });
+
+            // mobile drag
+           // this.slider.on('touchStart', this.events.touchmove.bind(this));
+           // this.slider.on('touchmove', this.events.touchmove.bind(this));
+
+            this.slider.on('dragstart', function(event) { event.preventDefault(); });
+
+            this.slider.on('swipe', this.events.move.bind(this) );
+            this.slider.on('mouseup touchend', this.events.cancelDragging.bind(this));
         },
 
         events : {
+            drag : {
+                offset : 0,
+                dragSibling : null
+            },
+
             btn : function(e){
                 var idx =  e.currentTarget.classList[1] == 'next' ? this.index + 1 : this.index - 1;
                 this.changeSlide(idx);
@@ -78,31 +91,77 @@
                 // Prevent default keyboard action (like navigating inside the page)
                 return this.settings.keys.next.indexOf(e.keyCode) >= 0 && this.changeSlide(idx) ||
                        this.settings.keys.prev.indexOf(e.keyCode) >= 0 && this.changeSlide(idx) || true;
+            },
+
+            transitionEnd : function(e){
+                e.currentTarget.removeAttribute('style');
+               // this.slider.removeClass('dragging prevSlide');
+            },
+
+            move : function(e, Dx, Dy){
+                var percent = (Dx / this.slider[0].clientWidth) * 100,
+                    idx = Dx > 0 ? this.index + 1 : this.index - 1; // the index to change to
+
+                this.slider.addClass('dragging');
+
+                this.events.drag.offset = percent;
+                percent = Math.abs(percent);
+                console.log(percent);
+
+                this.active[0].style.width = 100 - percent + '%';
+
+                // loop logic
+                if( idx > this.slides.length - 1 )
+                    idx = 0;
+                else if( idx < 0 )
+                    idx = this.slides.length - 1;
+
+                this.events.drag.dragSibling = this.slides.eq(idx); // the element which moves into  the frame
+
+               // elm.toggleClass('active', Dx > 0);
+                this.slider.toggleClass('prevSlide', Dx > 0);
+
+                this.events.drag.dragSibling[0].style.width = percent + '%';
+            },
+
+            cancelDragging : function(e){
+                var pointOfChange = 22;  // the amount of % change neeed to make the changing of the frame, esle snap back
+
+                this.slider.removeClass('dragging');
+                this.events.drag.dragSibling && this.events.drag.dragSibling.removeClass('active').removeAttr('style');
+                this.active.removeAttr('style');
+
+
+                if( this.events.drag.offset < -pointOfChange ){
+                    this.changeSlide(this.index - 1, true);
+                }
+                else if( this.events.drag.offset > pointOfChange ){
+                    this.changeSlide(this.index + 1, true);
+                }
+
+                // cleapup
+                this.events.drag.offset = 0;
+                this.events.drag.dragSibling = null;
             }
         },
 
         // change the current slide
-        changeSlide : function(idx){
+        changeSlide : function(idx, force){
             var isAnimating = this.active.width() < this.slider[0].clientWidth,
                 newActive = this.slides.eq(idx),
                 floatItem;
 
             // if there shouldn't be looping and it's the "edge", do not continue
-            if( isAnimating || (!this.settings.loop && !newActive.length) )
+            if( !force && isAnimating || (!this.settings.loop && !newActive.length) )
                 return;
 
             this.slider.toggleClass('prevSlide', idx < this.index);
 
             // loop logic
-            if( idx > this.slides.length - 1 ){
+            if( idx > this.slides.length - 1 )
                 idx = 0;
-            }
-            else if( idx < 0 ){
+            else if( idx < 0 )
                 idx = this.slides.length - 1;
-            }
-
-
-
 
             // find newActive again one "idx" has been fixed
             newActive = this.slides.eq(idx);
@@ -128,7 +187,9 @@
             var timer; // throttle timer
             return function($slide){
                 $slide = $slide || this.active;
-                var that = this, img, portrait;
+                var that = this,
+                    img, imgRatio, sliderRatio,
+                    isPortrait;
 
                 // Chrome doesn't report the dimentions properly unless theres a delay
                 clearTimeout(timer);
@@ -140,9 +201,12 @@
                         return;
                     }
 
-                    // TODO - savwe the image aspect-ratio and compare it to the slider's aspect ratio to determine if it's c:portrait or not
-                    portrait = img.clientHeight < that.slider[0].clientHeight || img.clientWidth > that.slider[0].clientWidth;
-                    $slide.toggleClass('portrait', portrait);
+                    // calculate aspct ratios of slide's image and the slider itself
+                    imgRatio = img.naturalWidth / img.naturalHeight;
+                    sliderRatio = that.slider[0].clientWidth / that.slider[0].clientHeight;
+
+                    isPortrait = imgRatio > sliderRatio;
+                    $slide.toggleClass('portrait', isPortrait);
                 }, 20);
             }
         })(),

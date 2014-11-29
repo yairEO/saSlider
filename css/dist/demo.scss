@@ -8,11 +8,12 @@ body{ font:14px 'Open Sans Condensed', 'Helvetica Neue', Arial; background:#1B20
     background: radial-gradient(ellipse at center, #2F3842 0%, #1B2026 100%);
 }
 
-#changeMode{ position:absolute; z-index:8; right:1em; top:1em; background:rgba(0,0,0,.02); padding:.3em 1em; color:#FFF; font-size:2em; text-shadow:0 0 6px rgba(0,0,0,.4); border:2px solid rgba(white,.6);
+#changeMode{ position:absolute; z-index:8; right:1.6em; top:1.6em; background:rgba(0,0,0,.02); padding:.3em 1em; color:#FFF; font-size:1.6em; text-shadow:0 0 6px rgba(0,0,0,.4); border:2px solid rgba(white,.6);
     &:hover{ border-color:#FFF; }
+    @media screen and(max-width:480px){
+        display:none;
+    }
 }
-
-
 
 
 
@@ -29,8 +30,7 @@ body{ font:14px 'Open Sans Condensed', 'Helvetica Neue', Arial; background:#1B20
 // saSlider MODE2
 
 .slider{ position:absolute; top:0; width:100%; right:0; }
-.slider.mode2{
-     width:50%; min-width:500px; height:calc(100% - 50px); margin:25px; border-radius:8px;
+.slider.mode2{ width:50%; min-width:500px; height:calc(100% - 50px); margin:25px; border-radius:8px; box-shadow:0 0 12px rgba(black,.4);
 
     > .indicators{ bottom:2%;
         > .wrap{
