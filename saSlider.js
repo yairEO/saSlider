@@ -127,11 +127,13 @@
                 this.events.drag.dirtySlides = this.events.drag.dirtySlides.add( this.events.drag.dragSibling[0] );
 
                // elm.toggleClass('active', Dx > 0);
+                that.slider.toggleClass('prevSlide', Dx > 0);
+
                 raf(function(){
                     that.slider.addClass('dragging');
-                    that.slider.toggleClass('prevSlide', Dx > 0);
 
-                    that.events.drag.dragSibling[0].style.width = percent + '%';
+                    if( that.events.drag.dragSibling )
+                        that.events.drag.dragSibling[0].style.width = percent + '%';
 
                     that.active[0].style.width = 100 - percent + '%';
                     that.events.drag.dirtySlides.not(that.events.drag.dragSibling).removeAttr('style');
