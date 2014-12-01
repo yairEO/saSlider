@@ -10,7 +10,12 @@
         DOM = {
             window   : $(window),
             document : $(document)
-        };
+        },
+        raf = window.requestAnimationFrame
+           || window.webkitRequestAnimationFrame
+           || window.mozRequestAnimationFrame
+           || window.msRequestAnimationFrame
+           || function(cb) { return window.setTimeout(cb, 1000 / 60); },
 
 
     // default settings
@@ -77,7 +82,8 @@
 
         events : {
             drag : {
-                offset : 0,
+                offset      : 0,
+                dirtySlides : $(), // a jQuery set of elements which have been styled and have yet to be reset
                 dragSibling : null
             },
 
@@ -94,21 +100,22 @@
             },
 
             transitionEnd : function(e){
-                e.currentTarget.removeAttribute('style');
+                //e.currentTarget.removeAttribute('style');
+                this.events.drag.dirtySlides = $();
+                this.slides.each(function(){
+                    this.removeAttribute('style');
+                })
                // this.slider.removeClass('dragging prevSlide');
             },
 
             move : function(e, Dx, Dy){
-                var percent = (Dx / this.slider[0].clientWidth) * 100,
+                var that = this,
+                    percent = (Dx / this.slider[0].clientWidth) * 100,
                     idx = Dx > 0 ? this.index + 1 : this.index - 1; // the index to change to
 
-                this.slider.addClass('dragging');
 
                 this.events.drag.offset = percent;
                 percent = Math.abs(percent);
-                console.log(percent);
-
-                this.active[0].style.width = 100 - percent + '%';
 
                 // loop logic
                 if( idx > this.slides.length - 1 )
@@ -117,11 +124,18 @@
                     idx = this.slides.length - 1;
 
                 this.events.drag.dragSibling = this.slides.eq(idx); // the element which moves into  the frame
+                this.events.drag.dirtySlides = this.events.drag.dirtySlides.add( this.events.drag.dragSibling[0] );
 
                // elm.toggleClass('active', Dx > 0);
-                this.slider.toggleClass('prevSlide', Dx > 0);
+                raf(function(){
+                    that.slider.addClass('dragging');
+                    that.slider.toggleClass('prevSlide', Dx > 0);
 
-                this.events.drag.dragSibling[0].style.width = percent + '%';
+                    that.events.drag.dragSibling[0].style.width = percent + '%';
+
+                    that.active[0].style.width = 100 - percent + '%';
+                    that.events.drag.dirtySlides.not(that.events.drag.dragSibling).removeAttr('style');
+                });
             },
 
             cancelDragging : function(e){
