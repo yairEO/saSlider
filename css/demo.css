@@ -438,6 +438,15 @@ body {
 	background: radial-gradient(ellipse at center, #2F3842 0%, #1B2026 100%);
 }
 
+a {
+	color: #48BAA3;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
 #changeMode {
 	position: absolute;
 	z-index: 8;
