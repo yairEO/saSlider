@@ -20,8 +20,8 @@
 
     // default settings
     defaults = {
-        loop       : true,        // Allows to navigate between first and last images
-        indicators : true,        // renderes a UI which the number of slider and the current one
+        loop       : true,        // Allows navigation between first and last images
+        indicators : true,        // Renderes a UI which shows the number of slides and marks the currently viewed one
         keys       : {
             prev  : '37, 80',     // keycodes to navigate to the previous image, default: Left arrow (37), 'p' (80)
             next  : '39, 78'      // keycodes to navigate to the next image, default: Right arrow (39), 'n' (78)
